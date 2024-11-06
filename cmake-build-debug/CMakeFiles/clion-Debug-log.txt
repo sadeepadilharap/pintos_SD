@@ -1,0 +1,35 @@
+"C:\Program Files\JetBrains\CLion 2024.2.0.1\bin\cmake\win\x64\bin\cmake.exe" -DCMAKE_BUILD_TYPE=Debug "-DCMAKE_MAKE_PROGRAM=C:/Program Files/JetBrains/CLion 2024.2.0.1/bin/ninja/win/x64/ninja.exe" -G Ninja -S \\wsl.localhost\Ubuntu\home\sadeepa\pintos_SD -B \\wsl.localhost\Ubuntu\home\sadeepa\pintos_SD\cmake-build-debug
+-- The C compiler identification is unknown
+-- Detecting C compiler ABI info
+-- Detecting C compiler ABI info - failed
+-- Check for working C compiler: C:/msys64/mingw64/bin/cc.exe
+-- Check for working C compiler: C:/msys64/mingw64/bin/cc.exe - broken
+CMake Error at C:/Program Files/JetBrains/CLion 2024.2.0.1/bin/cmake/win/x64/share/cmake-3.29/Modules/CMakeTestCCompiler.cmake:67 (message):
+  The C compiler
+
+    "C:/msys64/mingw64/bin/cc.exe"
+
+  is not able to compile a simple test program.
+
+  It fails with the following output:
+
+    Change Dir: '//wsl.localhost/Ubuntu/home/sadeepa/pintos_SD/cmake-build-debug/CMakeFiles/CMakeScratch/TryCompile-jut19u'
+    
+    Run Build Command(s): "C:/Program Files/JetBrains/CLion 2024.2.0.1/bin/ninja/win/x64/ninja.exe" -v cmTC_d6a01
+    [1/2] C:\msys64\mingw64\bin\cc.exe    -o CMakeFiles\cmTC_d6a01.dir\testCCompiler.c.obj -c \\wsl.localhost\Ubuntu\home\sadeepa\pintos_SD\cmake-build-debug\CMakeFiles\CMakeScratch\TryCompile-jut19u\testCCompiler.c
+    FAILED: CMakeFiles/cmTC_d6a01.dir/testCCompiler.c.obj 
+    C:\msys64\mingw64\bin\cc.exe    -o CMakeFiles\cmTC_d6a01.dir\testCCompiler.c.obj -c \\wsl.localhost\Ubuntu\home\sadeepa\pintos_SD\cmake-build-debug\CMakeFiles\CMakeScratch\TryCompile-jut19u\testCCompiler.c
+    Assembler messages:
+    Fatal error: can't create CMakeFiles\cmTC_d6a01.dir\testCCompiler.c.obj: Invalid argument
+    ninja: build stopped: subcommand failed.
+    
+    
+
+  
+
+  CMake will not be able to correctly generate this project.
+Call Stack (most recent call first):
+  CMakeLists.txt:2 (project)
+
+
+-- Configuring incomplete, errors occurred!

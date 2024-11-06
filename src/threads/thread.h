@@ -3,6 +3,8 @@
 
 #include <debug.h>
 #include <list.h>
+/* include synch.h */
+#include "threads/synch.h"
 #include <stdint.h>
 
 /* States in a thread's life cycle. */
@@ -13,6 +15,7 @@ enum thread_status
     THREAD_BLOCKED,     /* Waiting for an event to trigger. */
     THREAD_DYING        /* About to be destroyed. */
   };
+
 
 /* Thread identifier type.
    You can redefine this to whatever type you like. */
@@ -93,6 +96,24 @@ struct thread
     /* Shared between thread.c and synch.c. */
     struct list_elem elem;              /* List element. */
 
+    
+    struct list_elem blockedelem; 
+    int64_t sleep_ticks; 
+
+    struct list child_list;            
+    struct list_elem child_elem;       
+    struct thread *parent_t;           
+    struct semaphore init_sema;        
+    struct semaphore pre_exit_sema;    
+    struct semaphore exit_sema;        
+    bool status_load_success;          
+    int exit_status;                   
+
+    int next_fd;                       
+    struct list open_fd_list;          
+    struct file *process_file;         
+
+
 #ifdef USERPROG
     /* Owned by userprog/process.c. */
     uint32_t *pagedir;                  /* Page directory. */
@@ -118,6 +139,10 @@ tid_t thread_create (const char *name, int priority, thread_func *, void *);
 
 void thread_block (void);
 void thread_unblock (struct thread *);
+
+/* Adding thread sleep and thread wake methods. */
+void thread_sleep (int64_t);
+void thread_wake(int64_t);
 
 struct thread *thread_current (void);
 tid_t thread_tid (void);
