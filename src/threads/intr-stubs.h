@@ -1,6 +1,7 @@
 #ifndef THREADS_INTR_STUBS_H
 #define THREADS_INTR_STUBS_H
 
+
 /* Interrupt stubs.
 
    These are little snippets of code in intr-stubs.S, one for

@@ -3,9 +3,9 @@
 
 #include <debug.h>
 #include <list.h>
-/* include synch.h */
-#include "threads/synch.h"
 #include <stdint.h>
+#include "threads/synch.h"
+
 
 /* States in a thread's life cycle. */
 enum thread_status
@@ -15,7 +15,6 @@ enum thread_status
     THREAD_BLOCKED,     /* Waiting for an event to trigger. */
     THREAD_DYING        /* About to be destroyed. */
   };
-
 
 /* Thread identifier type.
    You can redefine this to whatever type you like. */
@@ -83,6 +82,24 @@ typedef int tid_t;
    only because they are mutually exclusive: only a thread in the
    ready state is on the run queue, whereas only a thread in the
    blocked state is on a semaphore wait list. */
+
+typedef struct child
+   {  
+      tid_t tid;
+      int status;
+      bool is_alive;
+      bool waited_once;
+      struct thread* parent;
+      struct list_elem elem;
+   }child_t;
+
+struct file_desc{
+    int fd;
+    char** name;
+    struct file* file;
+    struct list_elem elem;
+};
+
 struct thread
   {
     /* Owned by thread.c. */
@@ -95,33 +112,22 @@ struct thread
 
     /* Shared between thread.c and synch.c. */
     struct list_elem elem;              /* List element. */
+        uint32_t *pagedir;                  /* Page directory. */
+    struct thread* parent;              /* Parent process */
+    struct list children;               /* List to hold the children */
+    tid_t waiting_for;           /* Child tid for which the thread is waiting for*/
+    struct semaphore sema;              /* Semaphore to lock the child threads */
 
-    
-    struct list_elem blockedelem; 
-    int64_t sleep_ticks; 
+    struct file* executable_file;            
 
-    struct list child_list;            
-    struct list_elem child_elem;       
-    struct thread *parent_t;           
-    struct semaphore init_sema;        
-    struct semaphore pre_exit_sema;    
-    struct semaphore exit_sema;        
-    bool status_load_success;          
-    int exit_status;                   
-
-    int next_fd;                       
-    struct list open_fd_list;          
-    struct file *process_file;         
-
-
-#ifdef USERPROG
-    /* Owned by userprog/process.c. */
-    uint32_t *pagedir;                  /* Page directory. */
-#endif
+    unsigned fd_count;             /* Number of open files */
+    struct list files;             /* Array to keep reference to file pointers*/
 
     /* Owned by thread.c. */
     unsigned magic;                     /* Detects stack overflow. */
   };
+ 
+
 
 /* If false (default), use round-robin scheduler.
    If true, use multi-level feedback queue scheduler.
@@ -139,10 +145,6 @@ tid_t thread_create (const char *name, int priority, thread_func *, void *);
 
 void thread_block (void);
 void thread_unblock (struct thread *);
-
-/* Adding thread sleep and thread wake methods. */
-void thread_sleep (int64_t);
-void thread_wake(int64_t);
 
 struct thread *thread_current (void);
 tid_t thread_tid (void);
@@ -163,4 +165,5 @@ void thread_set_nice (int);
 int thread_get_recent_cpu (void);
 int thread_get_load_avg (void);
 
+struct thread* thread_get(tid_t);
 #endif /* threads/thread.h */

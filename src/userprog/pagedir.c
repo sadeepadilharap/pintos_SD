@@ -13,7 +13,7 @@ static void invalidate_pagedir (uint32_t *);
 /* Creates a new page directory that has mappings for kernel
    virtual addresses, but none for user virtual addresses.
    Returns the new page directory, or a null pointer if memory
-   allocation fails. */
+   allocation fails. */ 
 uint32_t *
 pagedir_create (void) 
 {

@@ -4,6 +4,7 @@
 #include "threads/palloc.h"
 #include "threads/vaddr.h"
 
+
 /* The Global Descriptor Table (GDT).
 
    The GDT, an x86-specific structure, defines segments that can
@@ -14,7 +15,7 @@
 
    Each entry in the GDT, which is known by its byte offset in
    the table, identifies a segment.  For our purposes only three
-   types of segments are of interest: code, data, and TSS or
+   types of segments are of interest: code, data, and TSS or 
    Task-State Segment descriptors.  The former two types are
    exactly what they sound like.  The TSS is used primarily for
    stack switching on interrupts.

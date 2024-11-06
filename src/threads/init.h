@@ -4,10 +4,10 @@
 #include <debug.h>
 #include <stdbool.h>
 #include <stddef.h>
-#include <stdint.h>
+#include <stdint.h> 
+
 
 /* Page directory with kernel mappings only. */
 extern uint32_t *init_page_dir;
-
 
 #endif /* threads/init.h */

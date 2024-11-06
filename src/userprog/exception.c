@@ -5,12 +5,12 @@
 #include "threads/interrupt.h"
 #include "threads/thread.h"
 
+
 /* Number of page faults processed. */
 static long long page_fault_cnt;
 
 static void kill (struct intr_frame *);
 static void page_fault (struct intr_frame *);
-
 
 /* Registers handlers for interrupts that can be caused by user
    programs.
@@ -28,7 +28,7 @@ static void page_fault (struct intr_frame *);
    Refer to [IA32-v3a] section 5.15 "Exception and Interrupt
    Reference" for a description of each of these exceptions. */
 void
-exception_init (void) 
+exception_init (void)  
 {
   /* These exceptions can be raised explicitly by a user program,
      e.g. via the INT, INT3, INTO, and BOUND instructions.  Thus,
@@ -149,6 +149,11 @@ page_fault (struct intr_frame *f)
   write = (f->error_code & PF_W) != 0;
   user = (f->error_code & PF_U) != 0;
 
+  f->eip = f->eax;
+  f->eax = 0xffffffff;
+  
+  exit(-1);
+  
   /* To implement virtual memory, delete the rest of the function
      body, and replace it with code that brings in the page to
      which fault_addr refers. */
@@ -157,6 +162,7 @@ page_fault (struct intr_frame *f)
           not_present ? "not present" : "rights violation",
           write ? "writing" : "reading",
           user ? "user" : "kernel");
+         
   kill (f);
 }
 

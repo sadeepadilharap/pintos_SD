@@ -8,7 +8,7 @@
 /* Interrupts on or off? */
 enum intr_level 
   {
-    INTR_OFF,             /* Interrupts disabled. */
+    INTR_OFF,             /* Interrupts disabled. */ 
     INTR_ON               /* Interrupts enabled. */
   };
 

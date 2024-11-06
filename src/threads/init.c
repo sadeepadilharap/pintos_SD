@@ -38,6 +38,7 @@
 #include "filesys/fsutil.h"
 #endif
 
+
 /* Page directory with kernel mappings only. */
 uint32_t *init_page_dir;
 
@@ -64,7 +65,7 @@ static char **read_command_line (void);
 static char **parse_options (char **argv);
 static void run_actions (char **argv);
 static void usage (void);
-void read_line(char line[], size_t size);
+void rdline(char line[], size_t size);
 
 #ifdef FILESYS
 static void locate_block_devices (void);
@@ -73,12 +74,11 @@ static void locate_block_device (enum block_type, const char *name);
 
 int pintos_init (void) NO_RETURN;
 
-
 /* Pintos main entry point. */
-
 int
 pintos_init (void)
 {
+  // printf("Hello, Pintos!\n");
   char **argv;
 
   /* Clear BSS. */  
@@ -130,46 +130,47 @@ printf ("Pintos booting with %'"PRIu32" kB RAM...\n",
   filesys_init (format_filesys);
 #endif
 
-  printf ("Boot complete.\n\n");
-  printf ("Happy codin!!\n\n");
+  printf ("Boot complete.\n");
 
   if (*argv != NULL) {
+    /* Run actions specified on kernel command line. */
     run_actions (argv);
   } else {
-    while(1) {
+    while(true) {
     	printf("CS2043>");
     	char line[10];
-    	read_line (line, 10);
+    	rdline (line, 10);
     	
     	if (strcmp(line,"whoami") == 0) { 
-    		printf("Name : Sadeepa Dilhara\nIndex: 220488X\n") ; 
+    		printf("Name: Prasanna W.A.S.D.,\n Index number: 220488X\n") ; 
     	} 
       else if (strcmp(line,"shutdown") == 0) {
-    		printf("Shutting Down...\n") ;
+    		printf("Shutting down pintos. Have a nice day!!\n") ;
         shutdown();
         thread_exit();
     	} 
       else if (strcmp(line,"time") == 0) {
-    		printf("Time since Unix epoch: %lu seconds\n", rtc_get_time());
+    		printf("Time passed Unix epoch: %lu sec\n", rtc_get_time());
     	} 
       else if (strcmp(line,"ram") == 0) {
     		printf("Available RAM: %u KB\n", init_ram_pages * PGSIZE / 1024);
     	} 
       else if (strcmp(line,"thread") == 0) {
+        printf("Thread stats are: \n");
     		thread_print_stats();
     	} 
       else if (strcmp(line,"priority") == 0) {
-    		printf("Priority number: %d\n", thread_get_priority());
+        printf("Priority number: %d\n", thread_get_priority());
         printf("Priority level : ");
 
-        switch(thread_get_priority()){
-          case 1:
-            printf("Low\n");break;
-          case 31:
-            printf("Medium\n");break;
-          case 63:
-            printf("High\n");break;
-          default:break;
+        int priority = thread_get_priority();
+    
+        if (priority == 1) {
+          printf("Low\n");
+        } else if (priority == 31) {
+          printf("Medium\n");
+        } else if (priority == 63) {
+          printf("High\n");
         }
       }
       else if (strcmp(line,"exit") == 0) {
@@ -177,7 +178,7 @@ printf ("Pintos booting with %'"PRIu32" kB RAM...\n",
     		break;
     	} 
       else 
-    		printf("Re-enter a valid command!\n");
+    		printf("Invalid Command. Please retry\n");
     }
   }
 
@@ -185,32 +186,41 @@ printf ("Pintos booting with %'"PRIu32" kB RAM...\n",
   shutdown ();
   thread_exit ();
 }
-void read_line(char line[], size_t size) {
-	char c;
-	char* pos = line;
+void rdline(char line[], size_t size) {
+    char c;
+    char* pos = line;
 
-	while ((c = input_getc()) != '\r'){
-	  if (pos >= line + size - 1) {
-	    printf("\nMax input exceeded\n");
-	    return;
-	  } 
-    else {
-	    if (c != '\b') {
-	    printf("%c",c);
-	    *pos++ = c;
-	    } 
-      else {
-	      if (pos > line){
-          printf("\b \b");
-          pos--;
-	      }
-	    }
-	  }
-	}
-	*pos = '\0';
-	printf("\n");
+    while (1) {
+        c = input_getc();
+
+        // Exit loop on carriage return
+        if (c == '\r') {
+            break;
+        }
+
+        // Check for max character limit
+        if (pos >= line + size - 1) {
+            printf("\nMax character limit reached\n");
+            return;
+        }
+
+        // Handle backspace
+        if (c == '\b') {
+            if (pos > line) {
+                printf("\b \b");
+                pos--;
+            }
+        }
+        // Handle regular character input
+        else {
+            printf("%c", c);
+            *pos++ = c;
+        }
+    }
+
+    *pos = '\0';
+    printf("\n");
 }
-
 /* Clear the "BSS", a segment that should be initialized to
    zeros.  It isn't actually stored on disk or zeroed by the
    kernel loader, so we have to zero it ourselves.

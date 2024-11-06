@@ -3,6 +3,7 @@
 
 #include "threads/loader.h"
 
+
 /* Segment selectors.
    More selectors are defined by the loader in loader.h. */
 #define SEL_UCSEG       0x1B    /* User code selector. */
@@ -13,3 +14,4 @@
 void gdt_init (void);
 
 #endif /* userprog/gdt.h */
+ 

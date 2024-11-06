@@ -7,6 +7,7 @@
 
 #include "threads/loader.h"
 
+
 /* Functions and macros for working with virtual addresses.
 
    See pte.h for functions and macros specifically for x86
@@ -20,9 +21,9 @@
 #define PGSIZE  (1 << PGBITS)              /* Bytes in a page. */
 #define PGMASK  BITMASK(PGSHIFT, PGBITS)   /* Page offset bits (0:12). */
 
-/* Offset within a page. */
+/* Offset within a page. */ 
 static inline unsigned pg_ofs (const void *va) {
-  return (uintptr_t) va & PGMASK;
+  return (uintptr_t) va & PGMASK; 
 }
 
 /* Virtual page number. */
