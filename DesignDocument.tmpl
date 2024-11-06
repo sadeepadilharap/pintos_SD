@@ -1,0 +1,183 @@
+             +--------------------------+
+             |          CS 2043         |
+             | PROJECT 2: USER PROGRAMS |
+             |     DESIGN DOCUMENT      |
+             +--------------------------+
+
+---- GROUP ----
+
+>> Fill in the names and email addresses of your group members.
+
+Prasanna W.A.S.D - 220488X
+
+---- PRELIMINARIES ----
+
+>> If you have any preliminary comments on your submission, notes for the
+>> TAs, or extra credit, please give them here.
+
+No additional comments.
+
+>> Please cite any offline or online sources you consulted while
+>> preparing your submission, other than the Pintos documentation, course
+>> text, lecture notes, and course staff.
+
+
+
+               ARGUMENT PASSING
+               ================
+
+---- DATA STRUCTURES ----
+
+>> A1: Copy here the declaration of each new or changed `struct' or
+>> `struct' member, global or static variable, `typedef', or
+>> enumeration.  Identify the purpose of each in 25 words or less.
+
+None; argument parsing implemented without new structures or variables.
+
+---- ALGORITHMS ----
+
+>> A2: Briefly describe how you implemented argument parsing.  How do
+>> you arrange for the elements of argv[] to be in the right order?
+>> How do you avoid overflowing the stack page?
+
+1. **setup_stack (void **esp, char* argv[], int argc):** Initializes the stack to arrange `argv[]` elements in the correct order.
+2. **process_execute (const char *file_name):** Starts a new thread to load and run the user program.
+3. **start_process (void *file_name_):** Initializes the thread, loads user processes, and arranges for execution.
+4. **load (const char *file_name, void (**eip) (void), void **esp):** Extracts command-line arguments and stores them in `argv` correctly.
+
+Stack overflow is avoided using `page_fault`, ensuring `esp` points to a valid address.
+
+---- RATIONALE ----
+
+>> A3: Why does Pintos implement strtok_r() but not strtok()?
+
+`strtok_r()` is reentrant and thread-safe, essential for tracking arguments within kernel context without altering shared state.
+
+>> A4: In Pintos, the kernel separates commands into an executable name
+>> and arguments. In Unix-like systems, the shell does this
+>> separation. Identify at least two advantages of the Unix approach.
+
+1. **Kernel Efficiency:** Reduced processing time by handling parsing outside.
+2. **Pre-processing:** Shells enable error checking, command chaining, and piping, reducing kernel-level failures.
+
+                 SYSTEM CALLS
+                 ============
+
+---- DATA STRUCTURES ----
+
+>> B1: Copy here the declaration of each new or changed `struct' or
+>> `struct' member, global or static variable, `typedef', or
+>> enumeration. Identify the purpose of each in 25 words or less.
+
+- **`child` struct:** Tracks each child thread’s status.
+- **`file_desc` struct:** Manages each open file by descriptor within a process.
+- **`thread` struct:** Holds relationships, open files, and process-specific details.
+
+>> B2: Describe how file descriptors are associated with open files.
+>> Are file descriptors unique within the entire OS or just within a
+>> single process?
+
+File descriptors are unique within a process, managed via `file_desc`, ensuring each process maintains unique descriptors.
+
+---- ALGORITHMS ----
+
+>> B3: Describe your code for reading and writing user data from the
+>> kernel.
+
+1. **Read:** Checks pointers, reads data, and returns the content.
+2. **Write:** Similar checks, followed by writing to the specified location, using locks for concurrency.
+
+>> B4: Suppose a system call causes a full page (4,096 bytes) of data
+>> to be copied from user space into the kernel. What is the least
+>> and the greatest possible number of inspections of the page table
+>> (e.g. calls to pagedir_get_page()) that might result? What about
+>> for a system call that only copies 2 bytes of data? Is there room
+>> for improvement in these numbers, and how much?
+
+- **Full Page (4096 bytes):** Min: 1, Max: 4096 inspections.
+- **2 Bytes:** Min: 1, Max: 2 inspections.
+  
+Optimization options are limited due to hardware constraints.
+
+>> B5: Briefly describe your implementation of the "wait" system call
+>> and how it interacts with process termination.
+
+`wait` leverages `process_wait` for synchronization with child processes, with the `child` struct tracking status and allowing `wait` to return exit status.
+
+>> B6: Any access to user program memory at a user-specified address
+>> can fail due to a bad pointer value. Describe the strategy or strategies you adopted for
+>> managing these issues. Give an example.
+
+`check_valid_uaddr` ensures valid user memory access, with processes terminated on invalid accesses. Failures trigger `page_fault`, resetting `eip` and `eax` to exit cleanly. Temporary resources are freed using cleanup functions.
+
+Example: In `write`, if a bad pointer is detected, locks and buffers are released before exiting.
+
+---- SYNCHRONIZATION ----
+
+>> B7: The "exec" system call returns -1 if loading the new executable
+>> fails, so it cannot return before the new executable has completed
+>> loading. How does your code ensure this? How is the load
+>> success/failure status passed back to the thread that calls "exec"?
+
+A semaphore delays return until loading is confirmed, with load status passed via `load` function.
+
+>> B8: Consider parent process P with child process C. How do you
+>> ensure proper synchronization and avoid race conditions when P
+>> calls wait(C) before C exits? After C exits? How do you ensure
+>> that all resources are freed in each case? How about when P
+>> terminates without waiting, before C exits? After C exits? Are
+>> there any special cases?
+
+Cases:
+- **P waits before C exits:** Semaphore ensures orderly execution.
+- **P waits after C exits:** Status directly available.
+- **P terminates before C exits:** Resources released; C continues independently.
+- **P terminates after C exits:** Resources released for both on exit.
+
+No special cases observed.
+
+---- RATIONALE ----
+
+>> B9: Why did you choose to implement access to user memory from the
+>> kernel in the way that you did?
+
+This method provides safe, validated interactions from kernel space with minimal impact on kernel functionality.
+
+>> B10: What advantages or disadvantages can you see to your design
+>> for file descriptors?
+
+**Advantages:** Simple, process-unique file management.
+**Disadvantages:** Non-system-wide uniqueness may limit certain shared access scenarios.
+
+>> B11: The default tid_t to pid_t mapping is the identity mapping.
+>> If you changed it, what advantages are there to your approach?
+
+N/A – Default mapping retained.
+
+               SURVEY QUESTIONS
+               ================
+
+>> In your opinion, was this assignment, or any one of the three problems
+>> in it, too easy or too hard? Did it take too long or too little time?
+
+Assignment difficulty and time commitment were appropriate for a thorough understanding.
+
+>> Did you find that working on a particular part of the assignment gave
+>> you greater insight into some aspect of OS design?
+
+System calls and error handling gave insight into kernel-user interaction management.
+
+>> Is there some particular fact or hint we should give students in
+>> future quarters to help them solve the problems? Conversely, did you
+>> find any of our guidance to be misleading?
+
+Clearer documentation on `exec` and synchronization would be helpful.
+
+>> Do you have any suggestions for the TAs to more effectively assist
+>> students, either for future quarters or the remaining projects?
+
+Quick Q&A sessions would aid in clarifying common issues.
+
+>> Any other comments?
+
+None
